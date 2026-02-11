@@ -25,9 +25,9 @@ EOT
     name                                  = string
     resource_group_name                   = string
     virtual_hub_id                        = string
-    bgp_route_translation_for_nat_enabled = optional(bool, false)
-    routing_preference                    = optional(string, "Microsoft Network")
-    scale_unit                            = optional(number, 1)
+    bgp_route_translation_for_nat_enabled = optional(bool)   # Default: false
+    routing_preference                    = optional(string) # Default: "Microsoft Network"
+    scale_unit                            = optional(number) # Default: 1
     tags                                  = optional(map(string))
     bgp_settings = optional(object({
       asn = number
