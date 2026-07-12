@@ -1,3 +1,7 @@
+output "vpn_gateways_id" {
+  description = "Map of id values across all vpn_gateways, keyed the same as var.vpn_gateways"
+  value       = { for k, v in azurerm_vpn_gateway.vpn_gateways : k => v.id }
+}
 output "vpn_gateways_bgp_route_translation_for_nat_enabled" {
   description = "Map of bgp_route_translation_for_nat_enabled values across all vpn_gateways, keyed the same as var.vpn_gateways"
   value       = { for k, v in azurerm_vpn_gateway.vpn_gateways : k => v.bgp_route_translation_for_nat_enabled }
