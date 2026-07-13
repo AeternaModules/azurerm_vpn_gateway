@@ -25,9 +25,9 @@ EOT
     name                                  = string
     resource_group_name                   = string
     virtual_hub_id                        = string
-    bgp_route_translation_for_nat_enabled = optional(bool)   # Default: false
-    routing_preference                    = optional(string) # Default: "Microsoft Network"
-    scale_unit                            = optional(number) # Default: 1
+    bgp_route_translation_for_nat_enabled = optional(bool)
+    routing_preference                    = optional(string)
+    scale_unit                            = optional(number)
     tags                                  = optional(map(string))
     bgp_settings = optional(object({
       asn = number
@@ -40,34 +40,13 @@ EOT
       peer_weight = number
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.vpn_gateways : (
-        length(v.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.vpn_gateways : (
-        v.routing_preference == null || (contains(["Microsoft Network", "Internet"], v.routing_preference))
-      )
-    ])
-    error_message = "must be one of: Microsoft Network, Internet"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.vpn_gateways : (
-        v.scale_unit == null || (v.scale_unit >= 0)
-      )
-    ])
-    error_message = "must be at least 0"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_vpn_gateway's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: resource_group_name
   #   condition: length(value) <= 90
   #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
@@ -88,6 +67,9 @@ EOT
   #   source:    [from virtualwans.ValidateVirtualHubID] !ok
   # path: virtual_hub_id
   #   source:    [from virtualwans.ValidateVirtualHubID] err != nil
+  # path: routing_preference
+  #   condition: contains(["Microsoft Network", "Internet"], value)
+  #   message:   must be one of: Microsoft Network, Internet
   # path: bgp_settings.instance_0_bgp_peering_address.custom_ips[*]
   #   source:    [from commonValidate.IPv4Address] !ok
   # path: bgp_settings.instance_0_bgp_peering_address.custom_ips[*]
@@ -96,6 +78,9 @@ EOT
   #   source:    [from commonValidate.IPv4Address] !ok
   # path: bgp_settings.instance_1_bgp_peering_address.custom_ips[*]
   #   source:    [from commonValidate.IPv4Address] four == nil
+  # path: scale_unit
+  #   condition: value >= 0
+  #   message:   must be at least 0
   # path: tags
   #   condition: length(value) <= 50
   #   message:   [from tags.Validate: invalid when len(value) > 50]
