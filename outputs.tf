@@ -8,7 +8,7 @@ output "vpn_gateways_bgp_route_translation_for_nat_enabled" {
 }
 output "vpn_gateways_bgp_settings" {
   description = "Map of bgp_settings values across all vpn_gateways, keyed the same as var.vpn_gateways"
-  value       = { for k, v in azurerm_vpn_gateway.vpn_gateways : k => v.bgp_settings if v.bgp_settings != null && length(v.bgp_settings) > 0 }
+  value       = { for k, v in azurerm_vpn_gateway.vpn_gateways : k => one(v.bgp_settings) if v.bgp_settings != null && length(v.bgp_settings) > 0 }
 }
 output "vpn_gateways_ip_configuration" {
   description = "Map of ip_configuration values across all vpn_gateways, keyed the same as var.vpn_gateways"
